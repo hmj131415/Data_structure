@@ -1,0 +1,25 @@
+# C/C++
+*.o
+*.out
+*.exe
+*.elf
+*.bin
+*.hex
+
+# build
+build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# VS Code
+.vscode/
+
+# 临时文件
+*.swp
+*.tmp
+
+# Python
+__pycache__/
+*.pyc
