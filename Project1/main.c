@@ -2,150 +2,118 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-typedef struct {
-    int *data;
-    int capacity;
-    int last_index;
-} sequence_list;
+#define MAX_SIZE 20
 
-sequence_list* sequence_list_init(int capacity) {
-    sequence_list* list = (sequence_list*)malloc(sizeof(sequence_list));
-    if (list == NULL)
+typedef struct node{
+    int data;
+    struct node* next;
+} Node;
+
+Node* initList() 
+{
+    Node* head = (Node*)malloc(sizeof(Node));
+    if (head==NULL)
     {
         /* code */
+        printf("Memory allocation failed\n");
         return NULL;
     }
-    list->data = (int*)malloc(sizeof(int) * capacity);
-    if (list->data == NULL)
-    {
-        /* code */
-        free(list);
-        return NULL;
-    }
-    list->capacity = capacity;
-    list->last_index = -1;
-    return list;
+    head->next = NULL;
+    return head;
 }
 
-void show_sequence_list(sequence_list* list) {
-    if (list == NULL) {
-        printf("Sequence list is NULL.\n");
-        return;
+
+
+//创建新节点
+Node* creat_new_node(int data)
+{
+    Node* new_node = (Node*)malloc(sizeof(Node));
+    if (new_node==NULL)
+    {
+        /* code */
+        printf("Memory allocation failed\n");
+        return NULL;
     }
-    printf("Sequence List: ");
-    for (int i = 0; i <= list->last_index; i++) {
-        printf("%d ", list->data[i]);
+    new_node->data = data;
+    new_node->next = NULL;
+    return new_node;
+}
+
+//在头节点后面增加节点
+void insert_node(Node* head,Node* new_node)
+{
+    new_node->next = head->next;
+    head->next = new_node;
+    return;
+}
+
+//剔除指定节点
+Node *delete_node(Node *list,int data)
+{
+    Node *p=list;
+    Node *temp  = NULL;
+    for ( p; p!=NULL;p=p->next)
+    {
+        /* code */
+        if (p->next!=NULL&&p->next->data==data)
+        {
+            /* code */
+            temp = p->next;
+            p->next = p->next->next;
+            temp->next = NULL; 
+            break;
+        }
+    }
+    return temp;
+}
+
+void show_list(Node* head)
+{
+    Node* p = head->next;
+    for (;p!=NULL; p=p->next)
+    {
+        /* code */
+        printf("%d ", p->data);
     }
     printf("\n");
 }
 
-bool isfull(sequence_list* list) {
-    return list->last_index >= list->capacity - 1;
-}
-
-bool isempty(sequence_list* list) {
-    return list->last_index == -1;
-}
-
-bool insert(sequence_list* list, int data ,int inserted_data) 
+//销毁链表
+Node *destroy(Node *head)
 {
-    if (isfull(list))
+    for (Node *temp = head,*n = head->next;temp!=NULL; temp=n)
     {
         /* code */
-        printf("Sequence list is full. Cannot insert %d.\n", data);
-        return false;
+        n = temp->next;
+        free(temp);       
     }
-    //查找被插入位置的前一个元素
-    int inserted_index = -1;
-    if (isempty(list))
-    {
-        /* code */
-        list->data[0] = data;
-        list->last_index++;
-        return true;
-    }
-    for (int i = 0; i <= list->last_index; i++)
-    {
-        /* code */
-        if (list->data[i] == inserted_data)
-        {
-            /* code */
-            //找到被插入位置的前一个元素
-            inserted_index = i;
-            break;
-        }
-    }
-    if (inserted_index==-1)
-    {
-        /* code */
-        printf("Inserted data %d not found. Cannot insert %d.\n", inserted_data, data);
-        return false;
-    }
-    //将被插入位置的后一个元素及其后面的元素向后移动一位
-    for (int i = list->last_index; i >= inserted_index; i--)
-    {
-        /* code */
-        list->data[i+1] = list->data[i];
-    }
-    //在被插入位置插入新元素
-    list->data[inserted_index] = data;
-     list->last_index++;
-    return true;
-}
-
-bool delete(sequence_list* list, int data) 
-{
-    if (isempty(list)) {
-        printf("Sequence list is empty. Cannot delete %d.\n", data);
-        return false;
-    }
-    int delete_index = -1;
-    for (int i = 0; i <= list->last_index; i++) 
-    {
-        if (list->data[i] == data) 
-        {
-            delete_index = i;
-            break;
-        }
-    }
-    if (delete_index == -1) {
-        printf("Data %d not found. Cannot delete.\n", data);
-        return false;
-    }
-    for (int i = delete_index; i < list->last_index; i++) {
-        list->data[i] = list->data[i + 1];
-    }
-    list->last_index--;
-    return true;
+    return NULL;
 }
 
 int main() 
 {
-    sequence_list* list = sequence_list_init(20);
-    if (list == NULL) 
-    {
-        printf("Failed to initialize sequence list.\n");
-        return 1;
-    }
-    printf("Sequence list initialized with capacity %d.\n", list->capacity);
-
-    for(int i =0;i <=10;i++)
-    {
-        if (!insert(list, i, i-1)) 
-        {
-            printf("Failed to insert %d into sequence list.\n", i);
-            show_sequence_list(list);
-        }
-        show_sequence_list(list);   
-    }   
-    for (int i = 10; i >=0; i--)
+    Node* head = initList();
+    for (int i = 0; i < MAX_SIZE; i++)
     {
         /* code */
-        if (!delete(list, i)) 
-        {
-            printf("Failed to delete %d from sequence list.\n", i);
-        }
-        show_sequence_list(list);
+        Node* new_node = creat_new_node(i);
+        insert_node(head, new_node);
+        show_list(head);
     }
+
+    // for (int i = MAX_SIZE-1; i>=0; i--)
+    // {
+    //     /* code */
+    //     Node *p = delete_node(head,i);
+    //     if (p==NULL)
+    //     {
+    //         /* code */
+    //         printf("链表中没有要删除的数据");
+    //         continue;
+    //     }
+    //     free(p);
+    //     show_list(head);
+    // }
+    // head = destroy(head);
     return 0;
 }
