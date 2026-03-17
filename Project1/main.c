@@ -1,126 +1,147 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
-#define MAX_SIZE 20
-
-typedef struct node{
-    int data;
-    struct node* next;
-} Node;
-
-Node* initList() 
+typedef struct node
 {
-    Node* head = (Node*)malloc(sizeof(Node));
-    if (head==NULL)
+    /* data */
+    int data;
+    struct node *prev;
+    struct node *next; 
+}Node;
+
+// 初始化双循环链表
+Node *list_init(void)
+{
+    Node *head = (Node *)malloc(sizeof(Node));
+    if(head == NULL)
     {
-        /* code */
-        printf("Memory allocation failed\n");
+        printf("list_init: malloc failed\n");
         return NULL;
     }
+    head->prev = head;
     head->next = head;
+    printf("双循环链表初始化成功: head = %p\n", head);
     return head;
 }
 
 
-
-//创建新节点
-Node* creat_new_node(int data)
+// 创建新节点
+Node *create_node(int data)
 {
-    Node* new_node = (Node*)malloc(sizeof(Node));
-    if (new_node==NULL)
+    Node *newnode = (Node *)malloc(sizeof(Node));
+    if(newnode == NULL)
     {
-        /* code */
-        printf("Memory allocation failed\n");
+        printf("create_node: malloc failed\n");
         return NULL;
     }
-    new_node->data = data;
-    new_node->next = new_node;
-    return new_node;
+    newnode->data = data;
+    newnode->prev = newnode;
+    newnode->next = newnode;
+    return newnode;
 }
 
-//在头节点后面增加节点
-void insert_node(Node* head,Node* new_node)
+// 头插法
+void insert_Head(Node *head, Node *newnode)
 {
-    new_node->next = head->next;
-    head->next = new_node;
-    return;
+    newnode->next = head->next;
+    newnode->prev = head;
+    head->next = newnode;
+    newnode->next->prev = newnode;
 }
 
-//剔除指定节点
-Node *delete_node(Node *head,int data)
+// 显示链表
+void show_list(Node *head)
 {
-    //找到要删除结点的上一个结点指针
-    Node *temp = head;
-    for (; temp->next!=head;temp=temp->next)
+    Node *p = head->next;
+    while(p != head)
     {
-        /* code */
-        if (temp->next->data == data)
-        {
-            /* code */
-            Node *index = temp->next;
-            temp->next = index->next;
-            index->next = index;
-            return index;
-        }
-    }
-    return NULL;
-}
-
-void show_list(Node* head)
-{
-    Node* p = head->next;
-    for (;p!=head; p=p->next)
-    {
-        /* code */
         printf("%d ", p->data);
+        p = p->next;
     }
     printf("\n");
 }
 
-//销毁链表
-Node *destroy(Node *head)
+// 尾插法
+void insert_Tail(Node *head, Node *newnode)
 {
-    if (head==NULL)
+    newnode->prev = head->prev;
+    newnode->next = head;
+    head->prev->next = newnode;
+    head->prev = newnode;
+}
+
+// 删除指定数据节点
+Node *remove_Node(Node *head, int data)
+{
+    Node *p = head->next;
+    while(p != head)
     {
-        /* code */
-        return NULL;
+        if(p->data == data)
+        {
+            p->prev->next = p->next;
+            p->next->prev = p->prev;
+            p->prev = p;
+            p->next = p;
+            return p;
+        }
+        p = p->next;
     }
-    while (head->next!=head)
-    {
-        /* code */
-        Node *temp = head->next;
-        head->next = head->next->next;
-        free(temp);
-    }
-    free(head);
+    printf("未找到数据为%d的节点\n", data);
     return NULL;
 }
 
-int main() 
+int main(void)
 {
-    Node* head = initList();
-    for (int i = 0; i < MAX_SIZE; i++)
+    Node *head = list_init();
+    for (int i = 0; i < 10; i++)
     {
-        /* code */
-        Node* new_node = creat_new_node(i);
-        insert_node(head, new_node);
+        /* code */Node *newnode = create_node(i);
+        if(newnode != NULL)
+        {
+            // 头插法
+            insert_Head(head, newnode);
+        }
+        // 最终输出9 8 7 6 5 4 3 2 1 0
         show_list(head);
     }
 
-    // for (int i = MAX_SIZE-1; i>=0; i--)
-    // {
-    //     /* code */
-    //     Node *p = delete_node(head,i);
-    //     if (p==NULL)
-    //     {
-    //         /* code */
-    //         printf("链表中没有要删除的数据");
-    //         continue;
-    //     }
-    //     free(p);
-    //     show_list(head);
-    // }
-    head = destroy(head);
+    for (int i = 1; i < 10; i++)
+    {
+        /* code */
+        Node *newnode = create_node(i);
+        if(newnode != NULL)
+        {
+            // 尾插法
+           insert_Tail(head, newnode);
+        }
+        // 最终输出9 8 7 6 5 4 3 2 1 0 1 2 3 4 5 6 7 8 9
+        show_list(head);
+    }
+    int n;
+    char ch;
+    printf("输入要删除的节点，输入Q或者q退出：");
+    while (1)
+    {
+        /* code */
+        if (scanf("%d",&n)==1)
+        {
+            /* code */
+            // 删除指定数据节点
+            Node *remove = remove_Node(head,n);
+            if(remove != NULL)
+            {
+                printf("删除节点成功: %d\n", remove->data);
+                show_list(head);
+            }
+        }
+        else if (scanf("%c",&ch)==1)
+        {
+            /* code */
+            if(ch == 'Q' || ch == 'q')
+            return 0;
+        }
+    }
+    
+
     return 0;
 }
