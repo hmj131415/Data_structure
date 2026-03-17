@@ -70,7 +70,35 @@ void insert_Tail(Node *head, Node *newnode)
     head->prev = newnode;
 }
 
+Node *find_Node(Node*head,int data)
+{
+    Node *P;
+    for (P = head->next; P != head; P = P->next)
+    {
+        if (P->data == data)
+        {
+            return P;
+        }
+    }
+    return NULL;
+}
+
+void remove_Node(Node *p)
+{
+    if (p==NULL)
+    {
+        /* code */
+        printf("要删除的节点不存在\n");
+        return;
+    }
+    p->prev->next = p->next;
+    p->next->prev = p->prev;
+    p->prev = p;
+    p->next = p;
+}
+
 // 删除指定数据节点
+/*
 Node *remove_Node(Node *head, int data)
 {
     Node *p = head->next;
@@ -89,6 +117,55 @@ Node *remove_Node(Node *head, int data)
     printf("未找到数据为%d的节点\n", data);
     return NULL;
 }
+*/
+
+//向后遍历链表
+void show_list_reverse(Node *head)
+{
+    if (head==NULL)
+    {
+        /* code */
+        printf("链表为空\n");
+        return;
+    }
+    for (Node *p = head->next; p!=head; p=p->next)
+    {
+        /* code */
+        printf("%d ", p->data);
+    }
+    
+    printf("\n");
+}
+
+//向前遍历列表
+void show_list_forward(Node *head)
+{
+    if (head==NULL)
+    {
+        /* code */
+        printf("链表为空\n");
+        return;
+    }
+    for (Node *p = head->prev; p!=head; p=p->prev)
+    {
+        /* code */
+        printf("%d ", p->data);
+    }
+    printf("\n");
+}
+
+//销毁列表
+Node *destroy_list(Node *head)
+{
+    for (Node *P = head->next; P != head; P = head->next)
+    {
+        /* code */
+        remove_Node(P);
+        free(P);
+    }
+    free(head);
+    return NULL;
+}
 
 int main(void)
 {
@@ -105,18 +182,21 @@ int main(void)
         show_list(head);
     }
 
-    for (int i = 1; i < 10; i++)
-    {
-        /* code */
-        Node *newnode = create_node(i);
-        if(newnode != NULL)
-        {
-            // 尾插法
-           insert_Tail(head, newnode);
-        }
-        // 最终输出9 8 7 6 5 4 3 2 1 0 1 2 3 4 5 6 7 8 9
-        show_list(head);
-    }
+    // for (int i = 1; i < 10; i++)
+    // {
+    //     /* code */
+    //     Node *newnode = create_node(i);
+    //     if(newnode != NULL)
+    //     {
+    //         // 尾插法
+    //        insert_Tail(head, newnode);
+    //     }
+    //     // 最终输出9 8 7 6 5 4 3 2 1 0 1 2 3 4 5 6 7 8 9
+    //     show_list(head);
+    // }
+
+    // 显示链表
+    
     int n;
     char ch;
     printf("输入要删除的节点，输入Q或者q退出：");
@@ -127,10 +207,15 @@ int main(void)
         {
             /* code */
             // 删除指定数据节点
-            Node *remove = remove_Node(head,n);
-            if(remove != NULL)
+
+            //Node *remove = remove_Node(head,n);  //反例，一个函数包含两个功能，查找指定位置并删除节点
+            
+            Node *P = find_Node(head,n);
+            if(P != NULL)
             {
-                printf("删除节点成功: %d\n", remove->data);
+                remove_Node(P);
+                printf("删除节点成功: %d\n", P->data);
+                free(P);
                 show_list(head);
             }
         }
@@ -138,10 +223,18 @@ int main(void)
         {
             /* code */
             if(ch == 'Q' || ch == 'q')
-            return 0;
+            break;
         }
     }
     
-
+    printf("链表顺序输出：");
+    show_list_reverse(head);
+    printf("链表逆序输出：");
+    show_list_forward(head);
+    head = destroy_list(head);
+    if(head == NULL)
+    {
+        printf("链表已成功销毁\n");
+    }
     return 0;
 }
