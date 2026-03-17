@@ -18,7 +18,7 @@ Node* initList()
         printf("Memory allocation failed\n");
         return NULL;
     }
-    head->next = NULL;
+    head->next = head;
     return head;
 }
 
@@ -35,7 +35,7 @@ Node* creat_new_node(int data)
         return NULL;
     }
     new_node->data = data;
-    new_node->next = NULL;
+    new_node->next = new_node;
     return new_node;
 }
 
@@ -48,29 +48,29 @@ void insert_node(Node* head,Node* new_node)
 }
 
 //剔除指定节点
-Node *delete_node(Node *list,int data)
+Node *delete_node(Node *head,int data)
 {
-    Node *p=list;
-    Node *temp  = NULL;
-    for ( p; p!=NULL;p=p->next)
+    //找到要删除结点的上一个结点指针
+    Node *temp = head;
+    for (; temp->next!=head;temp=temp->next)
     {
         /* code */
-        if (p->next!=NULL&&p->next->data==data)
+        if (temp->next->data == data)
         {
             /* code */
-            temp = p->next;
-            p->next = p->next->next;
-            temp->next = NULL; 
-            break;
+            Node *index = temp->next;
+            temp->next = index->next;
+            index->next = index;
+            return index;
         }
     }
-    return temp;
+    return NULL;
 }
 
 void show_list(Node* head)
 {
     Node* p = head->next;
-    for (;p!=NULL; p=p->next)
+    for (;p!=head; p=p->next)
     {
         /* code */
         printf("%d ", p->data);
@@ -81,12 +81,19 @@ void show_list(Node* head)
 //销毁链表
 Node *destroy(Node *head)
 {
-    for (Node *temp = head,*n = head->next;temp!=NULL; temp=n)
+    if (head==NULL)
     {
         /* code */
-        n = temp->next;
-        free(temp);       
+        return NULL;
     }
+    while (head->next!=head)
+    {
+        /* code */
+        Node *temp = head->next;
+        head->next = head->next->next;
+        free(temp);
+    }
+    free(head);
     return NULL;
 }
 
@@ -114,6 +121,6 @@ int main()
     //     free(p);
     //     show_list(head);
     // }
-    // head = destroy(head);
+    head = destroy(head);
     return 0;
 }
