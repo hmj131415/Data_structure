@@ -195,7 +195,7 @@ static bool linkStack_pop(linkStackManage *s,datatype *data)
 }
 
 //遍历链式栈，并执行操作
-static void linkStack_traverse(linkStackManage *s,void (*fun)(datatype *p))
+static void linkStack_traverse(linkStackManage *s,void (*fun)(int *p))
 {
     linkStackNode *node = s->top;
     while (node!=NULL)

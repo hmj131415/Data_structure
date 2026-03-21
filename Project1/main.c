@@ -1,88 +1,144 @@
-#include <stdio.h>
+#include "seqqueue.h"
 
-#define DATA_TYPE int  
-//顺序栈的操作
-#include "Stack.h"
-
-//打印栈
-void printStack(datatype *p)
+void printInt(datatype *p)
 {
     printf("%d ",*p);
 }
-
 int main()
 {
-    //顺序栈的操作
+
     /*
-    //初始化顺序空栈
-    seqStack *s = seqStack_init(10);
-    if (s == NULL)
+    //循环队列的操作
+
+    //初始化空的循环队列
+    seqQueue *queue = initSeqQueue(10);
+    if (queue == NULL)
     {
-        printf("seqStack_init failed\n");
+        printf("初始化顺序队列失败\n");
         return -1;
     }
-    else
-        printf("seqStack_init success\n");
+    printf("初始化顺序队列成功\n");
 
-    //入栈并打印栈
-    for (int i = 0; i < 10; i++)
+    while (1)   
     {
-        seqStack_push(s,i);
-        //打印栈顶
-        datatype top;
-        seqStack_top(s,&top);
-        printf("top data = %d\n",top);
-        seqStack_traverse(s,printStack);
-        printf("\n");
+        printf("请输入操作：数字入队，不是数字出队，q退出\n");
+        char op;
+        int x;
+        if (scanf("%d",&x))
+        {
+            //入队
+            if (enQueue(queue,x))
+            {
+                printf("入队成功\n");
+                //打印队列
+                traverseSeqQueue(queue,printInt);
+            }
+            else
+            {
+                printf("入队失败\n");
+                continue;
+            }
+            
+        }
+        else if (scanf("%c",&op))
+        {
+            if (op == 'q')
+            {
+                //退出
+                break;
+            }
+            else
+            {
+                //出队
+                int data;
+                if (deQueue(queue,&data))
+                {
+                    printf("出队成功，出队元素为：%d\n",data);
+                    //打印队列
+                    traverseSeqQueue(queue,printInt);
+                }
+                else
+                {
+                    printf("出队失败\n");
+                    continue;
+                }
+            }
+        }
     }
-
-
-
-    //出栈并打印栈
-    for (int i = 0; i < 10; i++)
-    {
-        datatype data;
-        seqStack_pop(s,&data);
-        printf("pop data = %d\n",data);
-        seqStack_traverse(s,printStack);
-        printf("\n");
-    }
-    
     return 0;
     */
 
-    //链式栈的操作
+    //链式队列的操作
 
-    //初始化空的链式栈
-    linkStackManage *s = linkStack_init();
-    if (s == NULL)
+    //初始化空的链式队列
+    linkQueueManage *queue = initLinkQueue();
+    if (queue == NULL)
     {
-        printf("linkStack_init failed\n");
+        printf("初始化链式队列失败\n");
         return -1;
     }
-    else
-        printf("linkStack_init success\n");
+    printf("初始化链式队列成功\n");
 
-    //链式栈的入栈
-    for (int i = 0; i < 10; i++)
+    printf("请输入操作：数字入队，不是数字出队，q退出\n");
+    while (1)
     {
-        linkStackNode *node = createLinkStackNode(i);
-        linkStack_push(s,node);
-        //打印栈顶
-        datatype top;
-        linkStack_top(s,&top);
-        printf("top data = %d\n",top);
-        linkStack_traverse(s,printStack);
-        printf("\n");
+        int data;
+        char op;
+
+        //入队操作
+        if (scanf("%d",&data))
+        {
+            
+            //创建节点
+            linkQueueNode *node = createLinkQueueNode(data);
+            if (node!=NULL)
+            {
+                //入队
+                if (enLinkQueue(queue,node))
+                {
+                    printf("入队成功\n");
+                    //打印队列
+                    traverseLinkQueue(queue,printInt);
+                }
+                else
+                {
+                    printf("入队失败\n");
+                    continue;
+                }
+            }
+        }
+        else if (scanf("%c",&op))
+        {
+            //退出循环
+            if (op=='q'||op=='Q')
+            {
+                break;
+            }
+            else
+            {
+                //出队
+                int data;
+                if (deLinkQueue(queue,&data))
+                {
+                    printf("出队成功，出队元素为：%d\n",data);
+                    //打印队列
+                    traverseLinkQueue(queue,printInt);
+                }
+                else
+                {
+                    printf("出队失败\n");
+                    continue;
+                }
+            }
+        }
+        
+        
     }
+
+        
+        
     
-    //链式栈的出栈
-    for (int i = 0; i < 10; i++)
-    {
-        datatype data;
-        linkStack_pop(s,&data);
-        printf("pop data = %d\n",data);
-        linkStack_traverse(s,printStack);
-        printf("\n");
-    }
-   }
+    
+    
+
+}
