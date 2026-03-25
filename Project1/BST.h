@@ -16,5 +16,6 @@ BSTNode *deleteBSTNode(BSTNode *root, int data);
 void preorder(BSTNode *root);
 void midorder(BSTNode *root);
 void postorder(BSTNode *root);
+void levelorder(BSTNode *root);
 
 #endif

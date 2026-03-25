@@ -2,7 +2,10 @@
 #include "BST.h"
 #include <stdlib.h>
 
+#define DATA_TYPE BSTNode*
+#include "seqqueue.h"
 
+ 
 //定义BST根节点指针
 BSTNode *BST_init(void)
 {
@@ -122,4 +125,40 @@ void postorder(BSTNode *root)
     postorder(root->lchild);
     postorder(root->rchild);
     printf("%d ", root->data);
+}
+
+//按层遍历
+void levelorder(BSTNode *root)
+{
+    //初始化空队列
+    linkQueueManage* queue = initLinkQueue();
+    if (queue==NULL)
+    {
+        printf("初始化队列失败\n");
+        return;
+    }
+    
+    //将根节点入队
+    linkQueueNode *rootnode = createLinkQueueNode(root);
+    enLinkQueue(queue,rootnode);
+
+    while (!__IsLinkEmpty(queue))
+    {
+        //出队
+        BSTNode *temp = NULL;
+        linkQueueNode *Qnode = deLinkQueue(queue,&temp);
+        printf("%d ", temp->data);
+        free(Qnode);
+        //将左子树入队
+        if(temp->lchild != NULL)
+        {
+            enLinkQueue(queue,createLinkQueueNode(temp->lchild));
+        }
+        //将右子树入队
+        if(temp->rchild != NULL)
+        {
+            enLinkQueue(queue,createLinkQueueNode(temp->rchild));
+        }
+    }
+    free(queue);
 }

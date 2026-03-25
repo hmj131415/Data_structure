@@ -42,5 +42,9 @@ int main()
     printf("\n后序遍历：");
     postorder(root);
 
+    //按层遍历输出BST树
+    printf("\n按层遍历：");
+    levelorder(root);
+
     return 0;
 }
