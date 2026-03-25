@@ -93,3 +93,33 @@ BSTNode *deleteBSTNode(BSTNode *root, int data)
     }
     return root;
 }
+
+//前序遍历
+void preorder(BSTNode *root)
+{
+    if(root == NULL)
+        return;
+    printf("%d ", root->data);
+    preorder(root->lchild);
+    preorder(root->rchild);
+}
+
+//中序遍历
+void midorder(BSTNode *root)
+{
+    if(root == NULL)
+        return;
+    midorder(root->lchild);
+    printf("%d ", root->data);
+    midorder(root->rchild);
+}
+
+//后序遍历
+void postorder(BSTNode *root)
+{
+    if(root == NULL)
+        return;
+    postorder(root->lchild);
+    postorder(root->rchild);
+    printf("%d ", root->data);
+}

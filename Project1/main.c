@@ -33,5 +33,14 @@ int main()
         //绘制BST树
         draw(root);
     }
+
+    //分别使用前序、中序、后序遍历输出BST树
+    printf("前序遍历：");
+    preorder(root);
+    printf("\n中序遍历：");
+    midorder(root);
+    printf("\n后序遍历：");
+    postorder(root);
+
     return 0;
 }

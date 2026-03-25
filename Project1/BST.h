@@ -13,5 +13,8 @@ BSTNode *BST_init(void);
 BSTNode *createBSTNode(int data);
 BSTNode *insertBSTNode(BSTNode *root, BSTNode *newnode);
 BSTNode *deleteBSTNode(BSTNode *root, int data);
+void preorder(BSTNode *root);
+void midorder(BSTNode *root);
+void postorder(BSTNode *root);
 
 #endif
