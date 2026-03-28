@@ -1,326 +1,299 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <stdbool.h>
+#define SIZE 100
 
-//二叉树结构体
-typedef struct BSTNode
+//遍历数组
+void traverseArray(int arr[], int size,void (*func)(int))
 {
-    int data;
-    struct BSTNode *lchild;
-    struct BSTNode *rchild;
-}BSTNode;
-
-//定义BST根节点指针
-BSTNode *BST_init(void)
-{
-    return NULL;
+    for(int i = 0; i < size; i++)
+    {
+        func(arr[i]);
+    }
+    printf("\n");
 }
 
-//创建BST节点
-BSTNode *createBSTNode(int data)
+//打印数组元素
+void printArrayElement(int d)
 {
-    BSTNode *node = (BSTNode *)malloc(sizeof(BSTNode));
-    if (node == NULL)
-    {
-        printf("BST节点内存分配失败\n");
-        return NULL;
-    }
-    node->data = data;
-    node->lchild = NULL;
-    node->rchild = NULL;
-    return node;
+    printf("%d ", d);
 }
 
-//插入BST节点
-BSTNode *insertBSTNode(BSTNode *root, BSTNode *newnode)
-{
-    if(root == NULL)
-    {
-        return newnode;
-    }
-    if (newnode->data<root->data)
-    {
-        root->lchild = insertBSTNode(root->lchild, newnode);
-    }
-    else if (newnode->data>root->data)
-    {
-        root->rchild = insertBSTNode(root->rchild, newnode);
-    }
-    else
-    {
-        printf("插入失败，节点数据已存在\n");
-        free(newnode);
-    }
-    return root;
-}
 
-//删除BST节点
-BSTNode *deleteBSTNode(BSTNode *root, int data)
+//经典插入排序
+void insertSort(int arr[], int size)
 {
-    if (root == NULL)
+    int i;
+    int temp;
+    int com_cnt = 0;
+    int move_cnt = 0;
+    if (size <= 1)
     {
-        return NULL;
+        return;
     }
-    //要删除的节点在右子树
-    if(data>root->data)
+    for (int i = 1; i < size; i++)
     {
-        root->rchild = deleteBSTNode(root->rchild, data);
-    }
-    //要删除的节点在左子树
-    else if(data<root->data)
-    {
-        root->lchild = deleteBSTNode(root->lchild, data);
-    }
-    //要删除的节点是根节点
-    else
-    {
-        BSTNode *temp = root;
-        //删除节点
-        if(root->lchild == NULL&&root->rchild == NULL)
+        temp = arr[i];
+        int j;
+        for (j = i-1; j >= 0; j--)
         {
-            //删除根节点
-            free(root);
-            return NULL;
+            com_cnt++;
+            if (temp>=arr[j])
+            {
+                break;
+            }
+            else
+            {
+                arr[j+1] = arr[j];
+                move_cnt++;
+            }
         }
-        else if(root->lchild != NULL)
+        arr[j+1] = temp;
+        move_cnt++;
+    }
+    printf("com_cnt = %d, move_cnt = %d\n", com_cnt, move_cnt);
+}
+
+//查找插入位置
+int findInsert(int arr[], int size, int key)
+{
+    int left = 0;
+    int right = size-1;
+    int pos = size;
+    while (left <= right)
+    {
+        int mid = (left+right)/2;
+        if (arr[mid]>key)
         {
-            for ( temp = root->lchild; temp->rchild != NULL; temp = temp->rchild);
-            root->data = temp->data;
-            root->lchild = deleteBSTNode(root->lchild, temp->data);
+            pos = mid;
+            right = mid-1;
         }
         else
         {
-            for ( temp = root->rchild; temp->lchild != NULL; temp = temp->lchild);
-            root->data = temp->data;
-            root->rchild = deleteBSTNode(root->rchild, temp->data);
+            left = mid+1;
         }
     }
-    return root;
+    return pos;
 }
 
-//前序遍历并执行回调函数
-void preorderTraversalWithCallback(BSTNode *root, void (*callback)(void *))
+//二分插入排序
+void binaryInsertSort(int arr[], int size)
 {
-    if(root == NULL)
+    int i;
+    int pos;
+    for ( i = 1; i < size; i++)
     {
-        return;
-    }
-    callback(&(root->data));
-    preorderTraversalWithCallback(root->lchild, callback);
-    preorderTraversalWithCallback(root->rchild, callback);
-}
-
-//中序遍历并执行回调函数
-void inorderTraversalWithCallback(BSTNode *root, void (*callback)(void *))
-{
-    if(root == NULL)
-    {
-        return;
-    }
-    inorderTraversalWithCallback(root->lchild, callback);
-    callback(&(root->data));
-    inorderTraversalWithCallback(root->rchild, callback);
-}
-
-//后序遍历并执行回调函数
-void postorderTraversalWithCallback(BSTNode *root, void (*callback)(void *))
-{
-    if(root == NULL)
-    {
-        return;
-    }
-    postorderTraversalWithCallback(root->lchild, callback);
-    postorderTraversalWithCallback(root->rchild, callback);
-    callback(&(root->data));
-}
-
-//定义队列节点结构体
-typedef struct SeqQueueNode
-{
-    BSTNode *data;
-    struct SeqQueueNode *next;
-}SeqQueueNode;
-
-
-//定义按层遍历队列管理结构体
-typedef struct SeqQueue
-{
-    int size;
-    SeqQueueNode *front;
-    SeqQueueNode *rear;
-}SeqQueue;
-
-
-
-//初始化队列
-SeqQueue *initSeqQueue(void)
-{
-    SeqQueue *q = (SeqQueue *)malloc(sizeof(SeqQueue));
-    if (q == NULL)
-    {
-        printf("队列内存分配失败\n");
-        return NULL;
-    }
-    q->size = 0;
-    q->front = q->rear = 0;
-    return q;
-}
-
-//创建新节点
-SeqQueueNode *createSeqQueueNode(BSTNode *data)
-{
-    SeqQueueNode *node = (SeqQueueNode *)malloc(sizeof(SeqQueueNode));
-    if (node == NULL)
-    {
-        printf("队列节点内存分配失败\n");
-        return NULL;
-    }
-    node->data = data;
-    node->next = NULL;
-    return node;
-}
-
-//判断队列是否为空
-bool __IsSeqEmpty(SeqQueue *q)
-{
-    return q->size == 0;
-}
-
-//按层便利结构体队列入队
-void enqueue(SeqQueue *q, BSTNode *data)
-{
-    SeqQueueNode *node = createSeqQueueNode(data);
-    if (node == NULL)
-    {
-        return;
-    }
-    if (__IsSeqEmpty(q))
-    {
-        q->front=node;
-    }
-    else
-    {
-        q->rear->next=node;
-    }
-    q->rear = node;
-    q->size++;
-}
-
-//按层便利结构体队列出队
-SeqQueueNode *dequeue(SeqQueue *q)
-{
-    if (__IsSeqEmpty(q))
-    {
-        return NULL;
-    }
-    SeqQueueNode *node = q->front;
-    q->front = q->front->next;
-    q->size--;
-    return node;
-}
-
-//按层便利
-void levelOrderTraversal(BSTNode *root, void (*callback)(void *))
-{
-    SeqQueue *q = initSeqQueue();
-    if (root == NULL)
-    {
-        printf("树为空\n");
-        return;
-    }
-    //入队根节点
-    enqueue(q, root);
-    while (!__IsSeqEmpty(q))
-    {
-        /* code */
-        //出队
-        SeqQueueNode *node = dequeue(q);
-        if (node == NULL)
+        pos = findInsert(arr, i, arr[i]);
+        int temp = arr[i];
+        for (int j = i-1; j >= pos; j--)
         {
-            break;
+            arr[j+1] = arr[j];
         }
-        callback(&(node->data->data));
-        //入队左子树
-        if (node->data->lchild != NULL)
-        {
-            enqueue(q, node->data->lchild);
-        }
-        //入队右子树
-        if (node->data->rchild != NULL)
-        {
-            enqueue(q, node->data->rchild);
-        }
+        arr[pos] = temp;
     }
-    return;
 }
 
-
-
-//销毁BST
-void destroyBST(BSTNode *root)
+//冒泡排序
+void bubbleSort(int arr[], int size)
 {
-    if(root == NULL)
-    {
-        return;
-    }
-    destroyBST(root->lchild);
-    destroyBST(root->rchild);
-    printf("销毁节点：%d\n", root->data);
-    free(root);
+   int i,j;
+   for ( i = 0; i < size-1; i++)
+   {
+       for ( j = 0; j < size-1-i; j++)
+       {
+            //比较相邻元素，若前一个大于后一个，则交换位置
+           if (arr[j]>arr[j+1])
+           {
+               int temp = arr[j];
+               arr[j] = arr[j+1];
+               arr[j+1] = temp;
+           }
+       }
+   }
 }
 
-//打印指定位置的节点数据
-void printNodeDataAtPosition(void *data)
+//冒泡排序优化
+void bubbleSortOptimized(int arr[], int size)
 {
-    printf("%d  ", *(int *)data);
-}
-
-//主函数
-int main(void)
-{
-    //初始化BST
-    BSTNode *root = BST_init();
-
-    printf("输入数字：,正数插入,负数删除,Q或q退出\n");
-    int num;
-    char cmd;
+    int i;
+    int epoch = 0;
+    int com_cnt = 0;
+    int move_cnt = 0;
     while (1)
     {
-        scanf("%d", &num);
-        if(scanf("%c", &cmd) == 1&&(cmd == 'Q'||cmd == 'q'))
+        bool swapped = false;
+        for (i = 0; i < size-1-epoch; i++)
+        {
+            com_cnt++;
+            //比较相邻元素，若前一个大于后一个，则交换位置
+            if (arr[i]>arr[i+1])
+            {
+                int temp = arr[i];
+                arr[i] = arr[i+1];
+                move_cnt++;
+                arr[i+1] = temp;
+                move_cnt++;
+                swapped = true;
+            }
+            else
+            {
+                continue;
+            }
+        }
+        epoch++;
+        if (!swapped)
         {
             break;
         }
-        else if (num >= 0)
-        {
-            //插入节点
+    }
+    printf("com_cnt = %d, move_cnt = %d\n", com_cnt, move_cnt);
+}
 
-            //创建节点
-            BSTNode *newnode = createBSTNode(num);
-            root = insertBSTNode(root, newnode);
-        }
-        else if (num < 0)
+//选择排序
+void selectionSort(int arr[], int size)
+{
+    int start;
+    for (start = 0; start < size-1; start++)
+    {
+        int min_index = start;
+        for (int i = start+1; i < size; i++)
         {
-            //删除节点
-            root = deleteBSTNode(root, -(num));
+            if (arr[i]<arr[min_index])
+            {
+                min_index = i;
+            }
+        }
+        if (min_index != start)
+        {
+            int temp = arr[start];
+            arr[start] = arr[min_index];
+            arr[min_index] = temp;
         }
     }
-    //前序遍历并执行回调函数
-    preorderTraversalWithCallback(root, printNodeDataAtPosition);
-    printf("\n");
-    //中序遍历并执行回调函数
-    inorderTraversalWithCallback(root, printNodeDataAtPosition);    
-    printf("\n");
-    //后序遍历并执行回调函数
-    postorderTraversalWithCallback(root, printNodeDataAtPosition);
-    printf("\n");
-    //按层遍历并执行回调函数
-    levelOrderTraversal(root, printNodeDataAtPosition);
-    printf("\n");
+}
+
+//交换函数
+void __swap(int *a, int *b)
+{
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+//划分函数
+int partition(int arr[], int length)
+{
+    int i = 0;
+    int j = length-1;
+    if (length <= 1)
+    {
+       return 0;
+    }
+    while (i<j)
+    {
+        while (arr[i]<=arr[j]&&i<j)
+            j--;
+        __swap(&arr[i], &arr[j]);
+        while (arr[i]<=arr[j]&&i<j)
+            i++;
+        __swap(&arr[i], &arr[j]);
+    }
+    return i;
+}
+
+//快速排序
+void quickSort(int arr[],int size)
+{
+    if (size <= 1)
+    {
+        return;
+    }
+    //找出基准元素并将数组划分为两部分
+    int pivot = partition(arr, size);
+    quickSort(arr, pivot);
+    quickSort(arr+pivot+1, size-pivot-1);
+}
+
+//希尔排序插入函数
+void shell_insertSort(int arr[], int gap, int size)
+{
+    int i, j;
+    int temp;
+    for (i = gap; i < size; i+=gap)
+    {
+        temp = arr[i];
+        for (j = i-gap; j >= 0; j-=gap)
+        {
+            if (temp>=arr[j])
+            {
+                break;
+            }
+            else
+            {
+                arr[j+gap] = arr[j];
+            }
+        }
+        arr[j+gap] = temp;
+    }
+}
+
+//希尔排序
+void shellSort(int arr[], int size)
+{
+    for (int gap = size/2; gap > 0; gap /= 2)
+    {
+        for (int i = 0; i < gap; i++)
+        {
+            //插入排序
+            //首地址 arr+i
+            //增量 gap
+            shell_insertSort(arr+i, gap,size-i);
+        }
+        
+    }
     
-    //销毁BST
-    destroyBST(root);
-    
-    //插入节点
+}
+
+int main(void)
+{
+    //生成无序整数数组
+    srand((unsigned int)time(NULL));
+    int arr[SIZE];
+    for(int i = 0; i < SIZE; i++)
+    {
+        arr[i] = rand() % 1000;
+    }
+    //遍历数组
+    traverseArray(arr, SIZE, printArrayElement);
+
+    // //经典插入排序
+    // insertSort(arr, SIZE);
+    // traverseArray(arr, SIZE, printArrayElement);
+
+    // //二分插入排序
+    // binaryInsertSort(arr, SIZE);
+    // traverseArray(arr, SIZE, printArrayElement);
+
+    // //冒泡排序
+    // bubbleSort(arr, SIZE);
+    // traverseArray(arr, SIZE, printArrayElement);
+
+    // //冒泡排序优化
+    // bubbleSortOptimized(arr, SIZE);
+    // traverseArray(arr, SIZE, printArrayElement);
+
+    // //选择排序
+    // selectionSort(arr, SIZE);
+    // traverseArray(arr, SIZE, printArrayElement);
+
+    // // //快速排序
+    // quickSort(arr, SIZE);
+    // traverseArray(arr, SIZE, printArrayElement);
+
+    //希尔排序
+    shellSort(arr, SIZE);
+    traverseArray(arr, SIZE, printArrayElement);
+
     return 0;
 }
