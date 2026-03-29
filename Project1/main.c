@@ -24,18 +24,15 @@ void printArrayElement(int d)
 //经典插入排序
 void insertSort(int arr[], int size)
 {
-    int i;
-    int temp;
+    
+    int i,j;
     int com_cnt = 0;
     int move_cnt = 0;
-    if (size <= 1)
+    //从第二个元素开始，依次将每个元素插入到前面已经排序好的部分中
+    for (i = 1; i < size; i++)
     {
-        return;
-    }
-    for (int i = 1; i < size; i++)
-    {
-        temp = arr[i];
-        int j;
+        int temp = arr[i];
+        //从已经排序好的部分的最后一个元素开始，依次比较每个元素与temp的大小
         for (j = i-1; j >= 0; j--)
         {
             com_cnt++;
@@ -45,8 +42,8 @@ void insertSort(int arr[], int size)
             }
             else
             {
-                arr[j+1] = arr[j];
                 move_cnt++;
+                arr[j+1] = arr[j];
             }
         }
         arr[j+1] = temp;
@@ -56,21 +53,26 @@ void insertSort(int arr[], int size)
 }
 
 //查找插入位置
-int findInsert(int arr[], int size, int key)
+int findInsert(int arr[], int len, int key, int *com_cnt)
 {
-    int left = 0;
-    int right = size-1;
-    int pos = size;
-    while (left <= right)
+    if (len<1)
     {
-        int mid = (left+right)/2;
+        return 0;
+    }
+    int left = 0;
+    int right = len-1;
+    int pos = len;
+    while (left<=right)
+    {
+        *com_cnt += 1;
+        int mid = left+(right-left)/2;
         if (arr[mid]>key)
         {
             pos = mid;
             right = mid-1;
         }
         else
-        {
+        {             
             left = mid+1;
         }
     }
@@ -80,42 +82,76 @@ int findInsert(int arr[], int size, int key)
 //二分插入排序
 void binaryInsertSort(int arr[], int size)
 {
-    int i;
-    int pos;
-    for ( i = 1; i < size; i++)
+    if (size<=1)
     {
-        pos = findInsert(arr, i, arr[i]);
+        return;
+    }
+    
+    int i,j;
+    int com_cnt = 0;    
+    int move_cnt = 0;
+    //从第二个元素开始，依次将每个元素插入到前面已经排序好的部分中
+    for (i = 1; i < size; i++)
+    {
         int temp = arr[i];
-        for (int j = i-1; j >= pos; j--)
+        //在已经排序好的部分中，使用二分查找找到temp的插入位置
+        int pos = findInsert(arr, i, temp, &com_cnt);
+        //将temp插入到已经排序好的部分中
+        for (j = i-1; j >= pos; j--)
         {
+            move_cnt++;
             arr[j+1] = arr[j];
         }
         arr[pos] = temp;
+        move_cnt++;
     }
+    printf("com_cnt = %d, move_cnt = %d\n", com_cnt, move_cnt);
 }
+    
+//交换函数
+void __swap(int *a, int *b)
+{
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
 
 //冒泡排序
 void bubbleSort(int arr[], int size)
 {
+    if (size<=1)
+    {
+        return;
+    }
    int i,j;
-   for ( i = 0; i < size-1; i++)
+   int com_cnt = 0;
+   int move_cnt = 0;
+   //每一轮冒泡排序，将最大的元素冒泡到数组的末尾
+   for (i = 0; i < size-1; i++)
    {
-       for ( j = 0; j < size-1-i; j++)
-       {
-            //比较相邻元素，若前一个大于后一个，则交换位置
-           if (arr[j]>arr[j+1])
-           {
-               int temp = arr[j];
-               arr[j] = arr[j+1];
-               arr[j+1] = temp;
-           }
-       }
+        //每一轮冒泡排序，下一次冒泡排序的范围就是当前冒泡排序的范围减一
+         for (j = 0; j < size-1-i; j++)
+         {
+             com_cnt++;
+             //比较相邻元素，若前一个大于后一个，则交换位置
+             if (arr[j]>arr[j+1])
+             {
+                 __swap(&arr[j], &arr[j+1]);
+                 move_cnt += 3;
+             }
+         }
    }
+    printf("com_cnt = %d, move_cnt = %d\n", com_cnt, move_cnt);
 }
 
 //冒泡排序优化
 void bubbleSortOptimized(int arr[], int size)
 {
+    if (size<=1)
+    {
+        return;
+    }
     int i;
     int epoch = 0;
     int com_cnt = 0;
@@ -129,16 +165,9 @@ void bubbleSortOptimized(int arr[], int size)
             //比较相邻元素，若前一个大于后一个，则交换位置
             if (arr[i]>arr[i+1])
             {
-                int temp = arr[i];
-                arr[i] = arr[i+1];
-                move_cnt++;
-                arr[i+1] = temp;
-                move_cnt++;
+                __swap(&arr[i], &arr[i+1]);
+                move_cnt += 3;
                 swapped = true;
-            }
-            else
-            {
-                continue;
             }
         }
         epoch++;
@@ -153,12 +182,19 @@ void bubbleSortOptimized(int arr[], int size)
 //选择排序
 void selectionSort(int arr[], int size)
 {
+    if (size<=1)
+    {
+        return;
+    }
     int start;
+    int com_cnt = 0;
+    int move_cnt = 0;
     for (start = 0; start < size-1; start++)
     {
         int min_index = start;
         for (int i = start+1; i < size; i++)
         {
+            com_cnt++;
             if (arr[i]<arr[min_index])
             {
                 min_index = i;
@@ -166,53 +202,68 @@ void selectionSort(int arr[], int size)
         }
         if (min_index != start)
         {
-            int temp = arr[start];
-            arr[start] = arr[min_index];
-            arr[min_index] = temp;
+            __swap(&arr[start], &arr[min_index]);
+            move_cnt += 3;
         }
     }
+    printf("com_cnt = %d, move_cnt = %d\n", com_cnt, move_cnt);
 }
 
-//交换函数
-void __swap(int *a, int *b)
-{
-    int temp = *a;
-    *a = *b;
-    *b = temp;
-}
+
 
 //划分函数
-int partition(int arr[], int length)
+int partition(int arr[], int size, int *com_cnt, int *move_cnt)
 {
-    int i = 0;
-    int j = length-1;
-    if (length <= 1)
+    int tepm = arr[0];
+    int right = size-1, left = 0;
+    while (left<right)
     {
-       return 0;
+        while (arr[right]>=tepm&&left<right)
+        {
+            *com_cnt += 1;
+            right--;
+        }
+        arr[left] = arr[right];
+        *move_cnt += 1;
+        while (arr[left]<=tepm&&left<right)
+        {
+            *com_cnt += 1;
+            left++;
+        }
+        arr[right] = arr[left];
+        *move_cnt += 1;
     }
-    while (i<j)
-    {
-        while (arr[i]<=arr[j]&&i<j)
-            j--;
-        __swap(&arr[i], &arr[j]);
-        while (arr[i]<=arr[j]&&i<j)
-            i++;
-        __swap(&arr[i], &arr[j]);
-    }
-    return i;
+    arr[left] = tepm;
+    *move_cnt += 1;
+    return left;
 }
 
+
+
 //快速排序
-void quickSort(int arr[],int size)
+void quickSort(int arr[], int size, int *com_cnt, int *move_cnt)
 {
-    if (size <= 1)
+    if (size<=1)
     {
         return;
     }
-    //找出基准元素并将数组划分为两部分
-    int pivot = partition(arr, size);
-    quickSort(arr, pivot);
-    quickSort(arr+pivot+1, size-pivot-1);
+    int pivot = partition(arr, size,com_cnt,move_cnt);
+    quickSort(arr, pivot,com_cnt, move_cnt);
+    quickSort(arr + pivot + 1, size - (pivot + 1), com_cnt, move_cnt);
+}
+
+//快速排序计次
+void quickSortCount(int arr[], int size)
+{
+    int com_cnt = 0;
+    int move_cnt = 0;
+    if (size<=1)
+    {
+        return;
+    }
+    quickSort(arr, size,&com_cnt,&move_cnt);
+    printf("com_cnt = %d, move_cnt = %d\n", com_cnt, move_cnt);
+    return;
 }
 
 //希尔排序插入函数
@@ -241,6 +292,10 @@ void shell_insertSort(int arr[], int gap, int size)
 //希尔排序
 void shellSort(int arr[], int size)
 {
+    if (size<=1)
+    {
+        return;
+    }
     for (int gap = size/2; gap > 0; gap /= 2)
     {
         for (int i = 0; i < gap; i++)
@@ -258,7 +313,7 @@ void shellSort(int arr[], int size)
 int main(void)
 {
     //生成无序整数数组
-    srand((unsigned int)time(NULL));
+    // srand((unsigned int)time(NULL));
     int arr[SIZE];
     for(int i = 0; i < SIZE; i++)
     {
@@ -287,13 +342,15 @@ int main(void)
     // selectionSort(arr, SIZE);
     // traverseArray(arr, SIZE, printArrayElement);
 
-    // // //快速排序
-    // quickSort(arr, SIZE);
+    // //快速排序
+    // quickSortCount(arr, SIZE);
     // traverseArray(arr, SIZE, printArrayElement);
 
-    //希尔排序
-    shellSort(arr, SIZE);
-    traverseArray(arr, SIZE, printArrayElement);
+
+
+    // //希尔排序
+    // shellSort(arr, SIZE);
+    // traverseArray(arr, SIZE, printArrayElement);
 
     return 0;
 }
